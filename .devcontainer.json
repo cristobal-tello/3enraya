@@ -1,0 +1,23 @@
+{
+  "name": "Android Kotlin Development",
+  "image": "thyrlian/android-sdk:latest",
+
+  // Instalación AUTOMÁTICA de extensiones dentro del contenedor
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "fwcd.kotlin",
+        "vscjava.vscode-gradle"
+      ]
+    }
+  },
+
+  // CRUCIAL: Mapea los puertos USB de tu PC real al contenedor de Docker
+  // Esto permite que el comando 'adb' del contenedor detecte tu móvil físico
+  "runArgs": [
+    "--privileged",
+    "-v", "/dev/bus/usb:/dev/bus/usb"
+  ],
+
+  "remoteUser": "root"
+}
