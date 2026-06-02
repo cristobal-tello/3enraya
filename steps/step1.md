@@ -62,6 +62,7 @@ mkdir -p app/src/main/java/com/ejemplo/tresenraya
 mkdir -p app/src/main
 touch settings.gradle.kts
 touch build.gradle.kts
+touch gradle.properties
 touch app/build.gradle.kts
 ```
 
@@ -123,6 +124,15 @@ android {
         versionName = "1.0"
     }
 
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+
     buildFeatures {
         compose = true
     }
@@ -160,6 +170,15 @@ Este archivo le dice al sistema operativo cuál es la pantalla principal que deb
         </activity>
     </application>
 </manifest>
+```
+
+### Paso 2.6: gradle.properties
+```kotlin
+# Habilita el uso de las librerías modernas AndroidX
+android.useAndroidX=true
+
+# Optimiza el uso de memoria de Gradle en el contenedor
+org.gradle.jvmargs=-Xmx2048m -XX:MaxMetaspaceSize=512m
 ```
 
 ---
@@ -217,7 +236,7 @@ class MainActivity : ComponentActivity() {
 Si solo quieres asegurar que el código es correcto y genera el binario `.apk` en segundo plano sin enviarlo a ningún dispositivo físico, ejecuta:
 
 ```bash
-./gradlew assembleDebug
+./gradlew clean assembleDebug
 ```
 
 Al finalizar con éxito, encontrarás el binario en `app/build/outputs/apk/debug/app-debug.apk`.
@@ -244,6 +263,7 @@ Una vez que tengas el cable conectado, sigue estos pasos en VS Code:
 1. Abre la terminal integrada de VS Code (dentro de Docker) y comprueba que el contenedor detecta tu hardware USB:
 
 ```bash
+adb kill-server
 adb devices
 ```
 
@@ -276,13 +296,53 @@ Crea una carpeta llamada `.vscode` en la raíz del proyecto y dentro genera el a
       "request": "attach",
       "name": "Kotlin: Vincular a Teléfono Android",
       "port": 5005,
-      "hostName": "localhost"
+      "hostName": "localhost",
+      "projectRoot": "${workspaceFolder}",
+      "sourcePaths": [
+        "${workspaceFolder}/app/src/main/java"
+      ],
+      "timeout": 30000
     }
   ]
 }
 ```
 
-### Paso 6.2: Flujo para detener la ejecución (Breakpoint de Prueba)
+### Paso 6.2: Compilar e instalar la app
+
+Hazlo cada vez que cambies el código fuente:
+
+```bash
+./gradlew installDebug
+```
+
+### Paso 6.3: Obtener el ID de proceso (PID) real de tu juego
+
+Con la app abierta en la pantalla del móvil:
+
+```bash
+adb shell pidof com.ejemplo.tresenraya
+```
+
+Te devolverá un número, por ejemplo: `18420`.
+
+### Paso 6.4: Destruir puentes residuales y abrir el canal limpio
+
+Usa el número del paso anterior:
+
+```bash
+adb forward --remove-all
+adb forward tcp:5005 jdwp:18420
+```
+
+### Paso 6.5: Validar el puente (opcional)
+
+Para estar 100% seguro de que el puerto escucha:
+
+```bash
+adb forward --list
+```
+
+### Paso 6.6: Flujo para detener la ejecución (Breakpoint de Prueba)
 
 1. Abre tu archivo `app/src/main/java/com/ejemplo/tresenraya/MainActivity.kt`.
 2. Coloca un **Breakpoint** haciendo clic en el margen izquierdo del número de línea (aparecerá el clásico punto rojo). Ponlo exactamente en la línea donde se incrementa el contador: `contador++`.
@@ -296,7 +356,7 @@ Crea una carpeta llamada `.vscode` en la raíz del proyecto y dentro genera el a
 
 Con este entorno validado y la certeza de que podemos instalar y depurar código en tiempo real, estamos listos para comenzar a diseñar formalmente la cuadrícula de 3x3 y la lógica interna de turnos para el juego.
 
-### Equivalencias Tecnológicas para tu Perfil
+### Equivalencias Tecnológicas
 
 | Concepto | En tu mundo (.NET / Symfony) | En este proyecto (Kotlin / VS Code) |
 | --- | --- | --- |

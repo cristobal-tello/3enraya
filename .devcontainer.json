@@ -1,6 +1,6 @@
 {
   "name": "Android Kotlin Development",
-  "image": "thyrlian/android-sdk:latest",
+  "image": "thyrlian/android-sdk:10.0",
 
   // Instalación AUTOMÁTICA de extensiones dentro del contenedor
   "customizations": {
