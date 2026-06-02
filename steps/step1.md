@@ -197,6 +197,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -206,8 +207,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            var mensaje by remember { mutableStateOf("Hola Mundo desde Kotlin") }
-            var contador by remember { mutableStateOf(0) }
+            var mensaje by rememberSaveable { mutableStateOf("Hola Mundo desde Kotlin") }
+            var contador by rememberSaveable { mutableStateOf(0) }
 
             Column(
                 modifier = Modifier.fillMaxSize(),
