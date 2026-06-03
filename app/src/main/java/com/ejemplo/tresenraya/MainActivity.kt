@@ -1,6 +1,7 @@
 package com.ejemplo.tresenraya
 
 import android.os.Bundle
+import android.util.Log // 🌟 IMPORTANTE: Añade este import
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -14,6 +15,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 class MainActivity : ComponentActivity() {
+
+    // 🌟 1. CREA ESTA FUNCIÓN TRADICIONAL AQUÍ (FUERA DE COMPOSE)
+    fun registrarPulsacion(valorActual: Int): Int {
+        val nuevoValor = valorActual + 1
+        Log.d("DEPURACION", "Incrementando contador a: $nuevoValor") // 🔴 PON TU BREAKPOINT AQUÍ
+        return nuevoValor
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -30,8 +39,8 @@ class MainActivity : ComponentActivity() {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Button(onClick = {
-                    contador++
-                    // NOTA: Pon aquí tu Breakpoint para la prueba de depuración
+                    
+                    contador = registrarPulsacion(contador)
                     mensaje = "¡Botón pulsado $contador veces!"
                 }) {
                     Text(text = "Presióname")

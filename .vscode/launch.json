@@ -1,0 +1,17 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "kotlin",
+      "request": "attach",
+      "name": "Kotlin: Vincular a Teléfono Android",
+      "port": 5005,
+      "hostName": "localhost",
+      "projectRoot": "${workspaceFolder}",
+      "sourcePaths": [
+        "${workspaceFolder}/app/src/main/java"
+      ],
+      "timeout": 30000
+    }
+  ]
+}

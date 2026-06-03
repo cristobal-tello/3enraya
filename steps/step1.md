@@ -191,6 +191,7 @@ Crea el archivo del código fuente en la ruta `app/src/main/java/com/ejemplo/tre
 package com.ejemplo.tresenraya
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -204,6 +205,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 class MainActivity : ComponentActivity() {
+
+    fun registrarPulsacion(valorActual: Int): Int {
+        val nuevoValor = valorActual + 1
+        Log.d("DEPURACION", "Incrementando contador a: $nuevoValor") // PON TU BREAKPOINT AQUÍ
+        return nuevoValor
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -220,8 +228,8 @@ class MainActivity : ComponentActivity() {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Button(onClick = {
-                    contador++
-                    // NOTA: Pon aquí tu Breakpoint para la prueba de depuración
+                    
+                    contador = registrarPulsacion(contador)
                     mensaje = "¡Botón pulsado $contador veces!"
                 }) {
                     Text(text = "Presióname")
@@ -264,7 +272,6 @@ Una vez que tengas el cable conectado, sigue estos pasos en VS Code:
 1. Abre la terminal integrada de VS Code (dentro de Docker) y comprueba que el contenedor detecta tu hardware USB:
 
 ```bash
-adb kill-server
 adb devices
 ```
 
@@ -318,7 +325,7 @@ Hazlo cada vez que cambies el código fuente:
 
 ### Paso 6.3: Obtener el ID de proceso (PID) real de tu juego
 
-Con la app abierta en la pantalla del móvil:
+IMPORTANTE: Con la app abierta en la pantalla del móvil:
 
 ```bash
 adb shell pidof com.ejemplo.tresenraya
