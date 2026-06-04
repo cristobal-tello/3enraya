@@ -1,11 +1,12 @@
 package com.ejemplo.tresenraya
 
 import android.os.Bundle
-import android.util.Log // 🌟 IMPORTANTE: Añade este import
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -15,35 +16,46 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 class MainActivity : ComponentActivity() {
-
-    // 🌟 1. CREA ESTA FUNCIÓN TRADICIONAL AQUÍ (FUERA DE COMPOSE)
-    fun registrarPulsacion(valorActual: Int): Int {
-        val nuevoValor = valorActual + 1
-        Log.d("DEPURACION", "Incrementando contador a: $nuevoValor") // 🔴 PON TU BREAKPOINT AQUÍ
-        return nuevoValor
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            var mensaje by rememberSaveable { mutableStateOf("Hola Mundo desde Kotlin") }
-            var contador by rememberSaveable { mutableStateOf(0) }
+            // 1. EL ESTADO
+            var nombre by rememberSaveable { mutableStateOf("") }
 
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(text = mensaje, fontSize = 24.sp)
+            // 2. EL CONTENEDOR DE ESTILO (Material Theme + Surface)
+            // Esto repara los colores automáticamente según el modo (claro/oscuro) de tu Samsung
+            MaterialTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background // Adapta el fondo al sistema
+                ) {
+                    // 3. EL CONTENEDOR VISUAL (Ahora dentro de Surface)
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(24.dp),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        // 4. EL COMPONENTE ENTRADA DE TEXTO
+                        OutlinedTextField(
+                            value = nombre,
+                            onValueChange = { nuevoTexto -> 
+                                nombre = nuevoTexto 
+                            },
+                            label = { Text("Escribe tu nombre") },
+                            modifier = Modifier.fillMaxWidth()
+                        )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(32.dp))
 
-                Button(onClick = {
-                    
-                    contador = registrarPulsacion(contador)
-                    mensaje = "¡Botón pulsado $contador veces!"
-                }) {
-                    Text(text = "Presióname")
+                        // 5. EL COMPONENTE REACTIVO
+                        if (nombre.isEmpty()) {
+                            Text(text = "Por favor, escribe algo...", fontSize = 20.sp)
+                        } else {
+                            Text(text = "¡Hola, $nombre! 👋", fontSize = 24.sp)
+                        }
+                    }
                 }
             }
         }
