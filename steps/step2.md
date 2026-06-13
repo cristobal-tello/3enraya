@@ -1,6 +1,6 @@
 # Guía de Desarrollo: 3 en Raya por Bluetooth (Kotlin)
 
-## MANUAL DE JETPACK COMPOSE: Estados y Flujo Declarativo (Ejercicio Práctico)
+## MANUAL DE JETPACK COMPOSE: Estados y Flujo Declarativo 
 
 Este documento es una introducción práctica a **Jetpack Compose**. Antes de pintar una matriz de 3x3 para el juego, es fundamental asimilar cómo funciona el cambio de paradigma de interfaces estáticas a interfaces reactivas basadas puramente en el **Estado**.
 
