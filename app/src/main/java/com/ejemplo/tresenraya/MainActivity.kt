@@ -49,7 +49,7 @@ fun GameBoard() {
     LaunchedEffect(isBoardFull) {
         if (isBoardFull) {
             delay(500) // medio segundo mostrando el mensaje
-            cells.indices.forEach { cells[it] = "" }
+            cells.fill("")
             isXTurn = true
         }
     }
@@ -93,7 +93,7 @@ fun GameBoard() {
 
         // 7. BOTÓN DE REINICIO MANUAL (sigue disponible)
         Button(onClick = {
-            for (i in 0..8) cells[i] = ""
+            cells.fill("")
             isXTurn = true
         }) {
             Text("Reiniciar Juego")
