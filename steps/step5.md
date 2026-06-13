@@ -36,13 +36,17 @@ La comprobación del ganador **no debe vivir dentro de un `@Composable`**. No ti
 * Recibe la lista de casillas y devuelve un `String?` (un *nullable*): `"X"` o `"O"` si hay ganador, o `null` si todavía no lo hay.
 
 ```kotlin
+// Las 8 líneas ganadoras son una CONSTANTE: una regla fija del juego que no
+// depende de ningún parámetro. Por eso vive fuera de la función, a nivel de
+// archivo, y se escribe una sola vez en lugar de recrearse en cada llamada.
+private val WINNING_LINES = listOf(
+    listOf(0, 1, 2), listOf(3, 4, 5), listOf(6, 7, 8), // filas
+    listOf(0, 3, 6), listOf(1, 4, 7), listOf(2, 5, 8), // columnas
+    listOf(0, 4, 8), listOf(2, 4, 6)                   // diagonales
+)
+
 fun calculateWinner(cells: List<String>): String? {
-    val lines = listOf(
-        listOf(0, 1, 2), listOf(3, 4, 5), listOf(6, 7, 8), // filas
-        listOf(0, 3, 6), listOf(1, 4, 7), listOf(2, 5, 8), // columnas
-        listOf(0, 4, 8), listOf(2, 4, 6)                   // diagonales
-    )
-    for ((a, b, c) in lines) {
+    for ((a, b, c) in WINNING_LINES) {
         // Si la primera casilla NO está vacía y las tres coinciden -> hay ganador
         if (cells[a].isNotEmpty() && cells[a] == cells[b] && cells[a] == cells[c]) {
             return cells[a]
@@ -52,7 +56,9 @@ fun calculateWinner(cells: List<String>): String? {
 }
 ```
 
-> Fíjate en `for ((a, b, c) in lines)`: Kotlin **desestructura** cada trío `listOf(0, 1, 2)` en tres variables de golpe, igual que `val (a, b, c) = ...`. Es azúcar sintáctico que hace el bucle legible.
+> Fíjate en `for ((a, b, c) in WINNING_LINES)`: Kotlin **desestructura** cada trío `listOf(0, 1, 2)` en tres variables de golpe, igual que `val (a, b, c) = ...`. Es azúcar sintáctico que hace el bucle legible.
+>
+> **¿Por qué `WINNING_LINES` fuera de la función?** No por rendimiento (recrear 8 listas diminutas es despreciable), sino por **intención**: las líneas ganadoras son una regla **constante** del 3 en raya, no algo que se calcule a partir de las casillas. Sacarla a un `private val` de archivo dice exactamente eso: "esto es fijo y se define una vez". La función queda reducida a su única responsabilidad: comparar.
 
 El `String?` con `?` es el sistema de **tipos nulos seguros** de Kotlin: el compilador te obliga a contemplar el caso "todavía no hay ganador" (`null`), evitando los temidos `NullPointerException`.
 
@@ -96,15 +102,17 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+// REGLA FIJA DEL JUEGO: las 8 líneas ganadoras como constante de archivo.
+private val WINNING_LINES = listOf(
+    listOf(0, 1, 2), listOf(3, 4, 5), listOf(6, 7, 8), // filas
+    listOf(0, 3, 6), listOf(1, 4, 7), listOf(2, 5, 8), // columnas
+    listOf(0, 4, 8), listOf(2, 4, 6)                   // diagonales
+)
+
 // LÓGICA DE DOMINIO: función pura, fuera de la interfaz.
 // Devuelve "X", "O" o null. No sabe nada de botones ni de Compose.
 fun calculateWinner(cells: List<String>): String? {
-    val lines = listOf(
-        listOf(0, 1, 2), listOf(3, 4, 5), listOf(6, 7, 8), // filas
-        listOf(0, 3, 6), listOf(1, 4, 7), listOf(2, 5, 8), // columnas
-        listOf(0, 4, 8), listOf(2, 4, 6)                   // diagonales
-    )
-    for ((a, b, c) in lines) {
+    for ((a, b, c) in WINNING_LINES) {
         if (cells[a].isNotEmpty() && cells[a] == cells[b] && cells[a] == cells[c]) {
             return cells[a]
         }

@@ -31,15 +31,17 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+// REGLA FIJA DEL JUEGO: las 8 líneas ganadoras como constante de archivo.
+private val WINNING_LINES = listOf(
+    listOf(0, 1, 2), listOf(3, 4, 5), listOf(6, 7, 8), // filas
+    listOf(0, 3, 6), listOf(1, 4, 7), listOf(2, 5, 8), // columnas
+    listOf(0, 4, 8), listOf(2, 4, 6)                   // diagonales
+)
+
 // LÓGICA DE DOMINIO: función pura, fuera de la interfaz.
 // Devuelve "X", "O" o null. No sabe nada de botones ni de Compose.
 fun calculateWinner(cells: List<String>): String? {
-    val lines = listOf(
-        listOf(0, 1, 2), listOf(3, 4, 5), listOf(6, 7, 8), // filas
-        listOf(0, 3, 6), listOf(1, 4, 7), listOf(2, 5, 8), // columnas
-        listOf(0, 4, 8), listOf(2, 4, 6)                   // diagonales
-    )
-    for ((a, b, c) in lines) {
+    for ((a, b, c) in WINNING_LINES) {
         if (cells[a].isNotEmpty() && cells[a] == cells[b] && cells[a] == cells[c]) {
             return cells[a]
         }
