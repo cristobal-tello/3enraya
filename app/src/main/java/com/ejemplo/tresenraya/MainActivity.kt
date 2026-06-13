@@ -31,24 +31,40 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+// REGLA FIJA DEL JUEGO: las 8 líneas ganadoras como constante de archivo.
+private val WINNING_LINES = listOf(
+    listOf(0, 1, 2), listOf(3, 4, 5), listOf(6, 7, 8), // filas
+    listOf(0, 3, 6), listOf(1, 4, 7), listOf(2, 5, 8), // columnas
+    listOf(0, 4, 8), listOf(2, 4, 6)                   // diagonales
+)
+
+// LÓGICA DE DOMINIO: función pura, fuera de la interfaz.
+// Devuelve "X", "O" o null. No sabe nada de botones ni de Compose.
+fun calculateWinner(cells: List<String>): String? {
+    for ((a, b, c) in WINNING_LINES) {
+        if (cells[a].isNotEmpty() && cells[a] == cells[b] && cells[a] == cells[c]) {
+            return cells[a]
+        }
+    }
+    return null
+}
+
 @Composable
 fun GameBoard() {
-    // 1. EL ESTADO: Una lista reactiva de 9 strings (inicialmente vacíos)
+    // 1. EL ESTADO PRIMARIO
     val cells = remember { mutableStateListOf("", "", "", "", "", "", "", "", "") }
-
-    // 2. ESTADO AUXILIAR: Alternador de turnos
     var isXTurn by remember { mutableStateOf(true) }
 
-    // 3. ESTADO DERIVADO: ¿Está el tablero completo?
-    // No es una variable nueva: se recalcula solo cada vez que cambia 'cells'.
+    // 2. ESTADO DERIVADO: se recalculan solos en cada recomposición
+    val winner = calculateWinner(cells)          // "X", "O" o null
     val isBoardFull = cells.none { it == "" }
+    val isGameOver = winner != null || isBoardFull
 
-    // 4. EFECTO SECUNDARIO: Reinicio automático diferido
-    // La clave es 'isBoardFull'. En cuanto pasa de false a true, esta corrutina
-    // se lanza: espera 0,5 s SIN congelar la pantalla y limpia el tablero.
-    LaunchedEffect(isBoardFull) {
-        if (isBoardFull) {
-            delay(500) // medio segundo mostrando el mensaje
+    // 3. EFECTO SECUNDARIO: cuando la partida acaba (victoria O empate),
+    // esperamos y reiniciamos. La victoria se muestra más tiempo que el empate.
+    LaunchedEffect(isGameOver) {
+        if (isGameOver) {
+            delay(if (winner != null) 1500 else 500)
             cells.fill("")
             isXTurn = true
         }
@@ -59,16 +75,19 @@ fun GameBoard() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // 5. MENSAJE CONDICIONAL: Si el tablero está lleno mostramos el aviso;
-        // en caso contrario, el indicador normal de turno.
+        // 4. MENSAJE CONDICIONAL: victoria > empate > turno normal
         Text(
-            text = if (isBoardFull) "¡Tablero completo! Reiniciando…"
-                   else if (isXTurn) "Turno de: X" else "Turno de: O",
+            text = when {
+                winner != null -> "¡Gana $winner! 🎉"
+                isBoardFull    -> "¡Empate!"
+                isXTurn        -> "Turno de: X"
+                else           -> "Turno de: O"
+            },
             fontSize = 28.sp,
             modifier = Modifier.padding(bottom = 32.dp)
         )
 
-        // 6. LA MATRIZ (Grid de 3x3)
+        // 5. LA MATRIZ (Grid de 3x3)
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
             modifier = Modifier.width(300.dp).height(300.dp),
@@ -79,8 +98,9 @@ fun GameBoard() {
                 CellButton(
                     value = cells[index],
                     onClick = {
-                        // Solo permitimos marcar si la casilla está vacía
-                        if (cells[index] == "") {
+                        // Solo se marca si NO hay ganador y la casilla está vacía.
+                        // El bloqueo por ganador evita seguir jugando tras la victoria.
+                        if (winner == null && cells[index] == "") {
                             cells[index] = if (isXTurn) "X" else "O"
                             isXTurn = !isXTurn
                         }
@@ -91,7 +111,7 @@ fun GameBoard() {
 
         Spacer(modifier = Modifier.height(48.dp))
 
-        // 7. BOTÓN DE REINICIO MANUAL (sigue disponible)
+        // 6. BOTÓN DE REINICIO MANUAL
         Button(onClick = {
             cells.fill("")
             isXTurn = true
